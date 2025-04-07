@@ -1,0 +1,90 @@
+<?php
+/**
+ * Dotdigital - https://dotdigital.com
+ * Copyright © Dotdigital Group PLC 2024-present. All rights reserved.
+ * This code may be used in conjunction with the module dotdigital/dotdigital-magento2-extension
+ * See https://github.com/dotmailer/dotmailer-magento2-extension/blob/master/LICENSE.md
+ */
+declare(strict_types=1);
+
+use Dotdigitalgroup\Email\Block\WebBehavior;
+use Hyva\DotdigitalgroupEmail\ViewModel\DotDigitalProductData;
+use Hyva\Theme\ViewModel\CurrentProduct;
+use Hyva\Theme\ViewModel\HyvaCsp;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+
+/**
+ * @var Escaper $escaper
+ * @var WebBehavior $block
+ * @var HyvaCsp $hyvaCsp
+ * @var ViewModelRegistry $viewModels
+ */
+
+/**
+ * Original module relied on the 'product_data_storage' object within the browser's local storage. The functionality to
+ * populate this with product data is originally the responsibility of the Magento_Catalog module, however this has not
+ * been mirrored by Hyvä Themes so a PHP-based solution has been devised instead. See the Slack thread below for
+ * additional context.
+ *
+ * @link https://hyva-themes.slack.com/archives/C01B8RV1ABG/p1631537450213900
+ * @see Dotdigitalgroup\Email\view\frontend\web\js\webBehaviorTracking.js
+ * @var DotDigitalProductData $dotDigitalProductDataViewModel
+ */
+$dotDigitalProductDataViewModel = $viewModels->require(DotDigitalProductData::class);
+
+/** @var CurrentProduct $currentProductViewModel */
+$currentProductViewModel = $viewModels->require(CurrentProduct::class);
+?>
+<script>
+    (() => {
+        /**
+         * @param data
+         */
+        const trackDotDigitalData = (data) => {
+            window.dmPt('track', data || {});
+        };
+
+        window.addEventListener('init-external-scripts', () => {
+            window.dm_insight_id = '<?= $escaper->escapeJs($block->getProfileId()); ?>';
+
+            /**
+             * Ported directly from the original module.
+             *
+             * @see Dotdigitalgroup\Email\view\frontend\web\js\webBehaviorTracking::initWbt()
+             */
+            (function (w, d, u, t, o, c) {
+                w['dmtrackingobjectname'] = o;
+                c = d.createElement(t);
+                c.async = true;
+                c.src = u;
+                t = d.getElementsByTagName(t)[0];
+                t.parentNode.insertBefore(c, t);
+                w[o] = w[o] || function () {
+                    (w[o].q = w[o].q || []).push(arguments);
+                };
+            })(window, document, '//static.trackedweb.net/js/_dmptv4.js', 'script', 'dmPt');
+
+            if (document.body.classList.contains('catalogsearch-result-index')) {
+                const search = window.location.search.match(/q=([^&]+)/);
+                trackDotDigitalData({
+                    'searched_term': search ? search[1] : ''
+                });
+                return;
+            }
+
+            <?php if ($currentProductViewModel->exists()): ?>
+            if (document.body.classList.contains('catalog-product-view')) {
+                const data = <?= /** @noEscape */ json_encode($dotDigitalProductDataViewModel->getData(
+                    $currentProductViewModel->get()
+                ));?>;
+                trackDotDigitalData(data);
+                return;
+            }
+            <?php endif ?>
+
+            trackDotDigitalData();
+        });
+    })();
+</script>
+<?php $hyvaCsp->registerInlineScript() ?>

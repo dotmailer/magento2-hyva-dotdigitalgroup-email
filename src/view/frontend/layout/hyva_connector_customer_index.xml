@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!--
+   Dotdigital - https://dotdigital.com
+   Copyright © Dotdigital Group PLC 2024-present. All rights reserved.
+   This code may be used in conjunction with the module dotdigital/dotdigital-magento2-extension
+   See https://github.com/dotmailer/dotmailer-magento2-extension/blob/master/LICENSE.md
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="customer_account"/>
+    <body>
+        <referenceContainer name="content">
+            <block
+                name="dd.account.subscriptions"
+                template="Dotdigitalgroup_Email::customer/account-subscriptions.phtml"
+                after="-"
+                cacheable="false">
+                <arguments>
+                    <argument name="containerConfig" xsi:type="object">
+                        Dotdigitalgroup\Email\ViewModel\Customer\AccountSubscriptions
+                    </argument>
+                </arguments>
+                <block
+                    name="dd.account.subscriptions.newsletter"
+                    template="Dotdigitalgroup_Email::customer/account/newsletter.phtml">
+                    <arguments>
+                        <argument name="config" xsi:type="object">
+                            Dotdigitalgroup\Email\ViewModel\Customer\Account\Newsletter
+                        </argument>
+                    </arguments>
+                </block>
+                <block
+                    name="dd.account.subscriptions.preferences"
+                    template="Dotdigitalgroup_Email::customer/account/preferences.phtml"
+                    ifconfig="connector_configuration/customer_addressbook/show_preferences">
+                    <arguments>
+                        <argument name="config" xsi:type="object">
+                            Dotdigitalgroup\Email\ViewModel\Customer\Account\Preferences
+                        </argument>
+                    </arguments>
+                </block>
+                <block
+                    name="dd.account.subscriptions.addressbooks"
+                    template="Dotdigitalgroup_Email::customer/account/addressbooks.phtml"
+                    ifconfig="connector_configuration/customer_addressbook/can_change">
+                    <arguments>
+                        <argument name="config" xsi:type="object">
+                            Dotdigitalgroup\Email\ViewModel\Customer\Account\AddressBooks
+                        </argument>
+                    </arguments>
+                </block>
+                <block
+                    name="dd.account.subscriptions.datafields"
+                    template="Dotdigitalgroup_Email::customer/account/datafields.phtml"
+                    ifconfig="connector_configuration/customer_addressbook/can_show_fields">
+                    <arguments>
+                        <argument name="config" xsi:type="object">
+                            Dotdigitalgroup\Email\ViewModel\Customer\Account\DataFields
+                        </argument>
+                    </arguments>
+                </block>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

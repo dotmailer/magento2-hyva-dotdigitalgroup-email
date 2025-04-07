@@ -1,0 +1,59 @@
+<?php
+
+declare(strict_types=1);
+
+use Dotdigitalgroup\Email\Block\Roi;
+use Hyva\Theme\ViewModel\HyvaCsp;
+use Magento\Framework\Escaper;
+
+/**
+ * @var Escaper $escaper
+ * @var Roi $block
+ * @var HyvaCsp $hyvaCsp
+ */
+?>
+<?php if ($block->isRoiTrackingAvailable()):
+
+    $dmmptUrl = $block->getPageTrackingUrlForSuccessPage();
+
+    // Tracking URL will only include the .js suffix if a version is set
+    if (strpos($dmmptUrl, '.js') === false) {
+        $dmmptUrl .= '.js';
+    }
+    ?>
+    <script>
+        (() => {
+            /**
+             * @param items
+             * @param total
+             */
+            const initRoiCode = (items, total) => {
+                items.forEach((item) => {
+                    window._dmTrack('product', item);
+                });
+
+                window._dmTrack('CheckOutAmount', total);
+                window._dmCallHandler();
+            };
+
+            const loadDmmpt = () => {
+                return new Promise(resolve => {
+                    const dmmptScript = document.createElement('script');
+                    dmmptScript.type = 'text/javascript';
+                    dmmptScript.src = '<?= $escaper->escapeUrl($dmmptUrl); ?>';
+                    dmmptScript.async = true;
+                    dmmptScript.onload = resolve;
+                    document.head.appendChild(dmmptScript);
+                });
+            }
+
+            window.addEventListener('DOMContentLoaded', () => {
+                loadDmmpt().then(() => initRoiCode(
+                    <?= /** @noEscape */ $block->getProductNames(); ?>,
+                    '<?= $escaper->escapeHtml($block->getTotal()); ?>'
+                ));
+            });
+        })();
+    </script>
+    <?php $hyvaCsp->registerInlineScript() ?>
+<?php endif; ?>

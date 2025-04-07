@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- The contents of this file have been copied directly from the original module -->
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/layout_generic.xsd">
+    <update handle="formkey"/>
+
+    <container name="root">
+        <block name="ddg.coupon.container"
+               class="Dotdigitalgroup\Email\Block\Coupon"
+               template="Dotdigitalgroup_Email::email/coupon.phtml"
+               cacheable="false"/>
+    </container>
+</layout>

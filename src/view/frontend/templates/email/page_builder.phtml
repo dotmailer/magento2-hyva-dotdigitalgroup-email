@@ -1,0 +1,55 @@
+<?php
+
+declare(strict_types=1);
+
+use Hyva\Theme\ViewModel\HyvaCsp;
+
+/**
+ * @var HyvaCsp $hyvaCsp
+ */
+?>
+<script>
+    const listenOnDotdigitalForm = (formId, shouldSubscribe = 0) => {
+        /**
+         * The 'onComplete' event listener is set up for the form.
+         * When the form is completed, it checks if the form should subscribe and if the email is not empty.
+         * If both conditions are met, it sends a POST request to 'newsletter/subscriber/new' with the email as data.
+         * Once the POST request is successful, it reloads the page.
+         */
+        window.ecPF.onComplete((formData) => {
+            const email = formData.contactEmail;
+            if (typeof window.dmPt !== 'undefined') {
+                window.dmPt('identify', email);
+            }
+            if (shouldSubscribe && email) {
+                fetch(`/newsletter/subscriber/new`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: new URLSearchParams({email: email})
+                })
+                    .then(() => window.location.reload())
+                    .catch(error => console.error('There has been a problem with your fetch operation:', error));
+            }
+        }, formId);
+    }
+    /**
+     * This event listener waits for the DOM to be fully loaded.
+     * Once the DOM is loaded, it performs operations window.__dmProcessedPages super global.
+     */
+    document.addEventListener("DOMContentLoaded", () => {
+
+        if (!window.__dmProcessedPages) {
+            return;
+        }
+
+        window.__dmProcessedPages.forEach((formId) => {
+            const script = document.querySelectorAll(`[id*=ddg-form-${formId}]`)
+            const wrapper = script[0].closest('[data-element="main"]')
+            listenOnDotdigitalForm(formId, wrapper.dataset.addRespondent)
+        });
+    });
+</script>
+<?php $hyvaCsp->registerInlineScript() ?>

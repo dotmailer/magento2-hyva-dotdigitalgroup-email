@@ -1,0 +1,40 @@
+<?php
+/**
+ * Dotdigital - https://dotdigital.com
+ * Copyright © Dotdigital Group PLC 2024-present. All rights reserved.
+ * This code may be used in conjunction with the module dotdigital/dotdigital-magento2-extension
+ * See https://github.com/dotmailer/dotmailer-magento2-extension/blob/master/LICENSE.md
+ */
+
+declare(strict_types=1);
+
+use Dotdigitalgroup\Email\Block\EmailCapture;
+use Hyva\Theme\ViewModel\HyvaCsp;
+use Magento\Framework\Escaper;
+
+/**
+ * @var EmailCapture $block
+ * @var Escaper $escaper
+ * @var HyvaCsp $hyvaCsp
+ */
+
+$trackingEnabled = $block->isWebBehaviourTrackingEnabled();
+$emailCaptureEnabledForCheckout = $block->isEasyEmailCaptureEnabled();
+$emailCaptureType = $block->getData('email_capture_type');
+$emailCaptureUrl = $emailCaptureType === 'checkout' ?
+    $escaper->escapeUrl($block->getEmailCaptureUrl()) :
+    '';
+?>
+<?php if ($trackingEnabled || $emailCaptureEnabledForCheckout): ?>
+    <script>
+        (() => {
+            window.addEventListener('DOMContentLoaded', () => {
+                dotDigitalEmailCapture(
+                    '<?= /** @noEscape */ $emailCaptureType ?? '' ?>',
+                    '<?= /** @noEscape */ $emailCaptureUrl ?? '' ?>',
+                );
+            });
+        })();
+    </script>
+    <?php $hyvaCsp->registerInlineScript() ?>
+<?php endif; ?>

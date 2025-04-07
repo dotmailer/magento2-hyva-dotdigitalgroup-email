@@ -1,0 +1,40 @@
+<?php
+/**
+ * Dotdigital - https://dotdigital.com
+ * Copyright © Dotdigital Group PLC 2024-present. All rights reserved.
+ * This code may be used in conjunction with the module dotdigital/dotdigital-magento2-extension
+ * See https://github.com/dotmailer/dotmailer-magento2-extension/blob/master/LICENSE.md
+ */
+
+declare(strict_types=1);
+
+use Dotdigitalgroup\Email\Block\Tracking;
+use Hyva\Theme\ViewModel\HyvaCsp;
+use Magento\Framework\Escaper;
+
+/** @var Tracking $block */
+/** @var Escaper $escaper */
+/** @var HyvaCsp $hyvaCsp */
+
+$trackingUrl = $block->getPageTrackingUrl();
+
+// Tracking URL will only include the .js suffix if a version is set
+if (strpos($trackingUrl, '.js') === false) {
+    $trackingUrl .= '.js';
+}
+?>
+<?php if ($block->isPageTrackingAvailable()): ?>
+    <script>
+        (() => {
+            window.addEventListener('init-external-scripts', () => {
+                let trackingScript = document.createElement('script');
+
+                trackingScript.type = 'text/javascript';
+                trackingScript.src = '<?= $escaper->escapeUrl($trackingUrl) ?>';
+
+                document.head.appendChild(trackingScript);
+            });
+        })();
+    </script>
+    <?php $hyvaCsp->registerInlineScript() ?>
+<?php endif; ?>

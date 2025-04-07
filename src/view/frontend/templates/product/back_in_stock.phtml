@@ -1,0 +1,94 @@
+<?php
+/**
+ * Dotdigital - https://dotdigital.com
+ * Copyright © Dotdigital Group PLC 2024-present. All rights reserved.
+ * This code may be used in conjunction with the module dotdigital/dotdigital-magento2-extension
+ * See https://github.com/dotmailer/dotmailer-magento2-extension/blob/master/LICENSE.md
+ */
+
+use Dotdigitalgroup\Email\ViewModel\ProductNotificationView;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/**
+ * @var $block Template
+ * @var $escaper Escaper
+ * @var $productNotification ProductNotificationView
+ */
+$productNotification = $block->getProductNotification();
+?>
+<?php if ($productNotification->canDisplay()): ?>
+    <script>
+        /**
+         * The backInStock object is responsible for managing the back in stock notification feature.
+         * It collects product data and initializes the feature when the DOM is fully loaded.
+         */
+        const backInStock = {
+            ddNotificationId: '',
+            outOfStockVariants: [],
+            productId: 0,
+            productName: '',
+            isSalable: false,
+
+            /**
+             * The collectData method collects product data and assigns it to the
+             * window.ddProductData variable as a resolved Promise.
+             */
+            collectData() {
+                let ddProductData = {
+                    id: this.productId,
+                    title: this.productName,
+                    available: this.isSalable,
+                    variants: JSON.parse(this.outOfStockVariants)
+                };
+                window.ddProductData = Promise.resolve(ddProductData);
+            },
+
+            /**
+             * The init method initializes the back in stock notification feature.
+             * It assigns the settings to the backInStock object and calls the collectData method.
+             * @param {Object} settings - The settings for the back in stock notification feature
+             */
+            init(settings) {
+                if (document.body.classList.contains('catalog-product-view')) {
+                    Object.assign(this, {
+                        ddNotificationId: settings.id,
+                        outOfStockVariants: settings.variants,
+                        productId: settings.product_id,
+                        productName: settings.product_name,
+                        isSalable: Number(settings.product_is_salable) === 1
+                    });
+                    this.collectData();
+                }
+            }
+        };
+
+        /**
+         * This event listener waits for the 'init-external-scripts' event to be dispatched.
+         * Once the event is dispatched, it creates a new script element, sets its attributes,
+         * and appends it to the document head.
+         * The 'once' option ensures that the listener is invoked only once and then it's removed.
+         * The 'passive' option indicates that the listener will never call preventDefault().
+         */
+        window.addEventListener('init-external-scripts', () => {
+            const BisScript = document.createElement('script');
+            BisScript.setAttribute('src',"<?= $productNotification->getProductNotificationScript(); //phpcs:ignore ?>" );
+            BisScript.setAttribute('async',true);
+            BisScript.setAttribute('type','text/javascript');
+            document.head.appendChild(BisScript);
+        }, {once: true, passive: true});
+
+        /**
+         * When the DOM is fully loaded, the back in stock notification feature is initialized with the product data.
+         */
+        window.addEventListener('DOMContentLoaded', () => {
+            backInStock.init({
+                id: "<?= $escaper->escapeJs($productNotification->getProductNotificationId()); ?>",
+                variants: "<?= $escaper->escapeJs($productNotification->getOutOfStockVariants());?>",
+                product_id: "<?= $escaper->escapeJs($productNotification->getProductId()); ?>",
+                product_name: "<?= $escaper->escapeJs($productNotification->getProductName()); ?>",
+                product_is_salable:  "<?= $escaper->escapeJs($productNotification->getProductIsSalable()); ?>"
+            });
+        });
+    </script>
+<?php endif; ?>

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="after.body.start">
+            <block class="Dotdigitalgroup\Email\Block\EmailCapture"
+                   name="ddg.email.capture.js"
+                   template="Hyva_DotdigitalgroupEmail::js/email-capture-js.phtml">
+            </block>
+        </referenceContainer>
+
+        <referenceContainer name="before.body.end">
+            <!-- Newsletter email capture -->
+            <block class="Dotdigitalgroup\Email\Block\EmailCapture"
+                   name="ddg.email_capture.newsletter"
+                   template="Hyva_DotdigitalgroupEmail::email/email_capture.phtml">
+                <arguments>
+                    <argument name="email_capture_type" xsi:type="string">newsletter</argument>
+                </arguments>
+            </block>
+            <!-- Page Builder -->
+            <block name="ddg.page.builder"
+                   template="Hyva_DotdigitalgroupEmail::email/page_builder.phtml">
+            </block>
+            <!-- Tracking -->
+            <block name="ddg.checkout.tag"
+                   class="Dotdigitalgroup\Email\Block\Tracking"
+                   template="Hyva_DotdigitalgroupEmail::email/tracking_code.phtml"/>
+            <block name="web.behavior.tracking"
+                   class="Dotdigitalgroup\Email\Block\WebBehavior"
+                   template="Hyva_DotdigitalgroupEmail::email/web_behavior_tracking.phtml"
+                   ifconfig="connector_configuration/tracking/tracking_profile_id"/>
+        </referenceContainer>
+    </body>
+</page>
