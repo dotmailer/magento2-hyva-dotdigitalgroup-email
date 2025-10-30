@@ -4,6 +4,9 @@
  * Copyright © Dotdigital Group PLC 2024-present. All rights reserved.
  * This code may be used in conjunction with the module dotdigital/dotdigital-magento2-extension
  * See https://github.com/dotmailer/dotmailer-magento2-extension/blob/master/LICENSE.md
+ *
+ * @deprecated This file is deprecated and will be removed in a future release.
+ * @see Dotdigitalgroup/Email/view/frontend/web/js/emailCapture.js
  */
 
 declare(strict_types=1);
@@ -21,96 +24,96 @@ $emailCaptureEnabledForCheckout = $block->isEasyEmailCaptureEnabled();
 
 if ($trackingEnabled || $emailCaptureEnabledForCheckout): ?>
 
-<script>
-    /**
-     * Capture customer email address for DotDigital service.
-     *
-     * @param type
-     * @param url
-     */
-    const dotDigitalEmailCapture = (type, url) => {
+    <script>
         /**
-         * Validate email address for DotDigital service.
+         * Capture customer email address for DotDigital service.
          *
-         * Ported directly from the original module.
-         *
-         * @see Dotdigitalgroup\Email\view\frontend\web\js\emailCapture.js
-         * @param email
+         * @param type
+         * @param url
          */
-        const dotDigitalEmailValidate = (email) => {
-            const regex = new RegExp([
-                '^([+\\w-\\.]+)@',
-                '((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|',
-                '(([\\w-]+\\.)+))',
-                '([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)$'
-            ].join(''));
+        const dotDigitalEmailCapture = (type, url) => {
+            /**
+             * Validate email address for DotDigital service.
+             *
+             * Ported directly from the original module.
+             *
+             * @see Dotdigitalgroup\Email\view\frontend\web\js\emailCapture.js
+             * @param email
+             */
+            const dotDigitalEmailValidate = (email) => {
+                const regex = new RegExp([
+                    '^([+\\w-\\.]+)@',
+                    '((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|',
+                    '(([\\w-]+\\.)+))',
+                    '([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)$'
+                ].join(''));
 
-            return regex.test(email);
-        };
+                return regex.test(email);
+            };
 
-        /**
-         * @param email
-         */
-        const captureEmail = (email) => {
-            if (!email || !dotDigitalEmailValidate(email)) {
-                return;
-            }
-
-            if (typeof window.dmPt !== 'undefined') {
-                window.dmPt('identify', email);
-            }
-        };
-
-        /**
-         * POST to connector/ajax/emailcapture (to update the quote).
-         *
-         * @param email
-         */
-        const postToConnectorAjaxRoute = (email) => {
-            if (url.length === 0) {
-                return;
-            }
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: "email=" + encodeURIComponent(email)
-            });
-        }
-
-        let selectors = [];
-
-        switch (type) {
-            case 'newsletter' :
-                selectors.push('input[id="newsletter-subscribe"]');
-                break;
-
-            case 'login' :
-                selectors.push('input[id="email"]');
-                break;
-
-            case 'checkout' :
-                selectors.push('input[id="guest_details-email_address"]');
-                break;
-        }
-
-        selectors.forEach((selector) => {
-            let element = document.querySelector(selector);
-            if (!element)
-                return;
-
-            element.addEventListener('blur', () => {
-                captureEmail(element.value);
-
-                if (type === 'checkout') {
-                    postToConnectorAjaxRoute(element.value);
+            /**
+             * @param email
+             */
+            const captureEmail = (email) => {
+                if (!email || !dotDigitalEmailValidate(email)) {
+                    return;
                 }
+
+                if (typeof window.dmPt !== 'undefined') {
+                    window.dmPt('identify', email);
+                }
+            };
+
+            /**
+             * POST to connector/ajax/emailcapture (to update the quote).
+             *
+             * @param email
+             */
+            const postToConnectorAjaxRoute = (email) => {
+                if (url.length === 0) {
+                    return;
+                }
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: "email=" + encodeURIComponent(email)
+                });
+            }
+
+            let selectors = [];
+
+            switch (type) {
+                case 'newsletter' :
+                    selectors.push('input[id="newsletter-subscribe"]');
+                    break;
+
+                case 'login' :
+                    selectors.push('input[id="email"]');
+                    break;
+
+                case 'checkout' :
+                    selectors.push('input[id="guest_details-email_address"]');
+                    break;
+            }
+
+            selectors.forEach((selector) => {
+                let element = document.querySelector(selector);
+                if (!element)
+                    return;
+
+                element.addEventListener('blur', () => {
+                    captureEmail(element.value);
+
+                    if (type === 'checkout') {
+                        postToConnectorAjaxRoute(element.value);
+                    }
+                });
             });
-        });
-    };
-</script>
+        };
+    </script>
     <?php $hyvaCsp->registerInlineScript() ?>
 <?php endif; ?>

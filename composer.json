@@ -2,11 +2,11 @@
     "name": "dotdigital/magento2-hyva-dotdigitalgroup-email",
     "description": "Hyvä Themes compatibility module for Dotdigitalgroup_Email",
     "type": "magento2-module",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "require": {
         "magento/framework": "*",
         "hyva-themes/magento2-compat-module-fallback": "*",
-        "dotdigital/dotdigital-magento2-extension": "^4.29.0"
+        "dotdigital/dotdigital-magento2-extension": "^4.33.0"
     },
     "authors": [
         {
