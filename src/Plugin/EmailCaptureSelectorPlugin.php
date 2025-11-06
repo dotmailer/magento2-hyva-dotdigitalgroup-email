@@ -21,13 +21,13 @@ class EmailCaptureSelectorPlugin
      */
     private $modularConfigSource;
 
-     /**
-      * @var array
-      */
-     const XML_PATHS_HYVA_DEFAULTS = [
-         'tracking/email_capture_selectors_hyva',
-         'tracking/email_capture_selectors_hyva_checkout'
-     ];
+    /**
+     * @var array
+     */
+    public const XML_PATHS_HYVA_DEFAULTS = [
+        'tracking/email_capture_selectors_hyva',
+        'tracking/email_capture_selectors_hyva_checkout'
+    ];
 
     /**
      * @param Json $serializer
@@ -88,7 +88,8 @@ class EmailCaptureSelectorPlugin
             $hyvaConfigPaths,
             function ($carry, $configPath) {
                 return array_merge($carry, $this->getConfigPath($configPath));
-            }, []
+            },
+            []
         );
     }
 }
