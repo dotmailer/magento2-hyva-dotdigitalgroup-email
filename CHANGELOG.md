@@ -1,3 +1,9 @@
+# 1.4.0
+
+### What's new
+- We have refactored the module's tracking and email capture functions for compatibility with the unified Dotdigital Tag.
+- We added the ability to target specific selectors for email capture in Hyvä Themes.
+
 # 1.3.0
 
 ## What's new
