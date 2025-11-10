@@ -14,7 +14,7 @@
             "email": "support@dotdigital.com"
         }
     ],
-    "license": "see LICENSE.md",
+    "license": "MIT",
     "autoload": {
         "files": [
             "src/registration.php"
