@@ -9,6 +9,11 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <update handle="customer_account"/>
     <body>
+        <referenceBlock name="page.main.title">
+            <action method="setPageTitle">
+                <argument translate="true" name="title" xsi:type="string">Newsletter Subscriptions</argument>
+            </action>
+        </referenceBlock>
         <referenceContainer name="content">
             <block
                 name="dd.account.subscriptions"
