@@ -1,3 +1,8 @@
+# 1.5.0
+
+### Improvements
+- We added missing XML to our layouts for compatibility with `hyva-themes/magento2-base-layout-reset`.
+
 # 1.4.0
 
 ### What's new
